@@ -26,7 +26,7 @@ namespace SteamAudio
     {
         public const uint kVersionMajor = 4;
         public const uint kVersionMinor = 8;
-        public const uint kVersionPatch = 0;
+        public const uint kVersionPatch = 1;
         public const uint kVersion = (kVersionMajor << 16) | (kVersionMinor << 8) | kVersionPatch;
     }
 

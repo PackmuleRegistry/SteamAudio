@@ -187,10 +187,8 @@ namespace SteamAudio
 
             if ((mSettings.audioEngine == AudioEngineType.Unity &&
                 distanceAttenuation &&
-                distanceAttenuationInput == DistanceAttenuationInput.CurveDriven &&
-                reflections &&
-                useDistanceCurveForReflections) ||
-                (pathing && distanceAttenuationInput == DistanceAttenuationInput.CurveDriven))
+                distanceAttenuationInput == DistanceAttenuationInput.CurveDriven) &&
+                ((reflections && useDistanceCurveForReflections) || pathing))
             {
                 mAttenuationData.rolloffMode = mAudioSource.rolloffMode;
                 mAttenuationData.minDistance = mAudioSource.minDistance;

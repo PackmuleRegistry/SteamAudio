@@ -64,6 +64,12 @@ namespace SteamAudio
         static int sNumSubTasks = 0;
         static int sNumSubTasksCompleted = 0;
 
+        static int sCurrentTask = 0;
+        static string sCurrentTaskName = "";
+        static int sCurrentSubTask = 0;
+        static int sNumSubTasksInCurrentTask = 0;
+        static string sCurrentSubTaskName = "";
+
         static bool sCancel = false;
         static BakedDataTask[] sTasks = null;
 
@@ -103,6 +109,12 @@ namespace SteamAudio
 
             sTasks = tasks;
             sStatus = BakeStatus.InProgress;
+
+            sCurrentTask = 0;
+            sCurrentTaskName = "";
+            sCurrentSubTask = 0;
+            sNumSubTasksInCurrentTask = 0;
+            sCurrentSubTaskName = null;
 
             sProgressCallback = new ProgressCallback(AdvanceProgress);
 
@@ -154,6 +166,12 @@ namespace SteamAudio
 #endif
             sNumSubTasks = 0;
             sNumSubTasksCompleted = 0;
+
+            sCurrentTask = 0;
+            sCurrentTaskName = null;
+            sCurrentSubTask = 0;
+            sNumSubTasksInCurrentTask = 0;
+            sCurrentSubTaskName = null;
 
             sStatus = BakeStatus.Ready;
 
@@ -226,6 +244,7 @@ namespace SteamAudio
         {
 #if UNITY_EDITOR
             sProgress = progress;
+            UpdateBakeProgress(sCurrentTask, sTasks.Length, sCurrentTaskName, sCurrentSubTask, sNumSubTasksInCurrentTask, sCurrentSubTaskName);
 #endif
         }
 
@@ -284,6 +303,12 @@ namespace SteamAudio
                     taskName = string.Format("{0} (Reflections)", sTasks[i].name);
                 }
 
+                sCurrentTask = i;
+                sCurrentTaskName = taskName;
+                sCurrentSubTask = 0;
+                sNumSubTasksInCurrentTask = 0;
+                sCurrentSubTaskName = null;
+
                 Debug.Log(string.Format("START: Baking effect for {0}.", taskName));
 
                 if (sTasks[i].probeBatches != null)
@@ -306,6 +331,10 @@ namespace SteamAudio
                             Debug.LogWarning(string.Format("{0}: Probe Batch {1} has no probes, skipping.", taskName, sTasks[i].probeBatchNames[j]));
                             continue;
                         }
+
+                        sCurrentSubTask = j;
+                        sCurrentSubTaskName = sTasks[i].probeBatchNames[j];
+                        sNumSubTasksInCurrentTask = sTasks[i].probeBatches.Length;
 
                         var probeBatch = new ProbeBatch(SteamAudioManager.Context, sTasks[i].probeBatchAssets[j]);
 

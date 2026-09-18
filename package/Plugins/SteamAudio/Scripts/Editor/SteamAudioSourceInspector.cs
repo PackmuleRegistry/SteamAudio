@@ -136,10 +136,7 @@ namespace SteamAudio
             if (audioEngineIsUnity)
             {
                 EditorGUILayout.PropertyField(mDistanceAttenuation);
-                if (mDistanceAttenuation.boolValue)
-                {
-                    EditorGUILayout.PropertyField(mDistanceAttenuationInput);
-                }
+                EditorGUILayout.PropertyField(mDistanceAttenuationInput);
             }
 
             if (audioEngineIsUnity)
