@@ -1,5 +1,5 @@
 ﻿//
-// Copyright 2017 Valve Corporation. All rights reserved. Subject to the following license:
+// Copyright 2017-2023 Valve Corporation. Subject to the following license:
 // https://valvesoftware.github.io/steam-audio/license.html
 //
 
@@ -67,6 +67,7 @@ namespace SteamAudio
         bool mSimulationCompleted = false;
         float mSimulationUpdateTimeElapsed = 0.0f;
         bool mSceneCommitRequired = false;
+        Camera mMainCamera;
 
         static SteamAudioManager sSingleton = null;
 
@@ -195,25 +196,27 @@ namespace SteamAudio
 
         public static PerspectiveCorrection GetPerspectiveCorrection()
         {
-            PerspectiveCorrection correction;
-            if (Camera.main != null && Camera.main.aspect > .0f)
+            if (!SteamAudioSettings.Singleton.perspectiveCorrection)
+                return default;
+
+            var mainCamera = Singleton.GetMainCamera();
+            PerspectiveCorrection correction = default;
+            if (mainCamera != null && mainCamera.aspect > .0f)
             {
                 correction.enabled = SteamAudioSettings.Singleton.perspectiveCorrection ? Bool.True : Bool.False;
                 correction.xfactor = 1.0f * SteamAudioSettings.Singleton.perspectiveCorrectionFactor;
-                correction.yfactor = correction.xfactor / Camera.main.aspect;
+                correction.yfactor = correction.xfactor / mainCamera.aspect;
 
                 // Camera space matches OpenGL convention. No need to transform matrix to ConvertTransform.
-                correction.transform = Common.TransformMatrix(Camera.main.projectionMatrix * Camera.main.worldToCameraMatrix);
-            }
-            else
-            {
-                correction.enabled = Bool.False;
-                correction.xfactor = 1.0f;
-                correction.yfactor = 1.0f;
-                correction.transform = Common.TransformMatrix(UnityEngine.Matrix4x4.identity);
+                correction.transform = Common.TransformMatrix(mainCamera.projectionMatrix * mainCamera.worldToCameraMatrix);
             }
 
             return correction;
+        }
+
+        public Camera GetMainCamera()
+        {
+            return mMainCamera;
         }
 
         public static SimulationSettings GetSimulationSettings(bool baking)
@@ -444,6 +447,7 @@ namespace SteamAudio
         {
             LoadScene(scene, mContext, additive: (loadSceneMode == LoadSceneMode.Additive));
 
+            NotifyMainCameraChanged();
             NotifyAudioListenerChanged();
         }
 
@@ -462,6 +466,12 @@ namespace SteamAudio
             {
                 sSingleton.mListenerComponent = sSingleton.mListener.GetComponent<SteamAudioListener>();
             }
+        }
+
+        // Call this function when you create or change the main camera.
+        public static void NotifyMainCameraChanged()
+        {
+            sSingleton.mMainCamera = Camera.main;
         }
 
         // Call this function to request that changes to a scene be committed. Call only when changes have happened.
