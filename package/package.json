@@ -1,6 +1,6 @@
 {
   "name": "com.valvesoftware.steamaudio",
-  "version": "4.6.0",
+  "version": "4.6.1",
   "displayName": "Steam Audio",
   "description": "Steam Audio is a cross-platform software toolkit for spatial audio. You can use it to add rich, immersive positional and environmental audio effects to games and VR/AR apps.",
   "unity": "2017.3",
