@@ -506,6 +506,7 @@ namespace SteamAudio
             if (mAudioEngineState == null)
                 return;
 
+            mAudioEngineState.SetHRTFDisabled(SteamAudioSettings.Singleton.hrtfDisabled);
             var perspectiveCorrection = GetPerspectiveCorrection();
             mAudioEngineState.SetPerspectiveCorrection(perspectiveCorrection);
 
@@ -1259,6 +1260,12 @@ namespace SteamAudio
 
             var dataAsset = (!exportOBJ) ? GetDataAsset(dynamicObject) : null;
             var objFileName = (exportOBJ) ? GetOBJFileName(dynamicObject) : "";
+
+            if (!exportOBJ && dataAsset == null)
+                return;
+
+            if (exportOBJ && (objFileName == null || objFileName.Length == 0))
+                return;
 
             Export(objects, dynamicObject.name, dataAsset, objFileName, true, exportOBJ);
         }
