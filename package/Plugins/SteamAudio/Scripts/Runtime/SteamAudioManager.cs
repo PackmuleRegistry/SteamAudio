@@ -439,7 +439,8 @@ namespace SteamAudio
 
 #if UNITY_EDITOR && UNITY_2019_3_OR_NEWER
                 // If the developer has disabled scene reload, SceneManager.sceneLoaded won't fire during initial load
-                if (EditorSettings.enterPlayModeOptions.HasFlag(EnterPlayModeOptions.DisableSceneReload))
+                if ( EditorSettings.enterPlayModeOptionsEnabled &&
+                    EditorSettings.enterPlayModeOptions.HasFlag(EnterPlayModeOptions.DisableSceneReload))
                 {
                     OnSceneLoaded(SceneManager.GetActiveScene(), LoadSceneMode.Single);
                 }
@@ -469,10 +470,18 @@ namespace SteamAudio
         }
 
         // Call this function when you create a new AudioListener component (or its equivalent, if you are using
-        // third-party audio middleware).
+        // third-party audio middleware). Use this function if you want Steam Audio to automatically find the new
+        // AudioListener.
         public static void NotifyAudioListenerChanged()
         {
-            sSingleton.mListener = AudioEngineStateHelpers.Create(SteamAudioSettings.Singleton.audioEngine).GetListenerTransform();
+            NotifyAudioListenerChangedTo(AudioEngineStateHelpers.Create(SteamAudioSettings.Singleton.audioEngine).GetListenerTransform());
+        }
+
+        // Call this function when you want to explicitly specify a new AudioListener component (or its equivalent, if
+        // you are using third-party audio middleware).
+        public static void NotifyAudioListenerChangedTo(Transform listenerTransform)
+        {
+            sSingleton.mListener = listenerTransform;
             if (sSingleton.mListener)
             {
                 sSingleton.mListenerComponent = sSingleton.mListener.GetComponent<SteamAudioListener>();
